@@ -11,6 +11,7 @@ import { Colors, UserRoles } from '../constants/theme';
 import SplashScreen from '../screens/SplashScreen.jsx';
 import WelcomeScreen from '../screens/WelcomeScreen.jsx';
 import LoginScreen from '../screens/LoginScreen.jsx';
+import SignupScreen from '../screens/SignupScreen.jsx';
 import DashboardScreen from '../screens/DashboardScreen.jsx';
 import ControlScreen from '../screens/ControlScreen.jsx';
 import AlertsScreen from '../screens/AlertsScreen.jsx';
@@ -138,6 +139,11 @@ const AuthStackNavigator = () => {
         name="Login" 
         component={LoginScreen}
         options={{ gestureEnabled: false }}
+      />
+      <Stack.Screen 
+        name="Signup" 
+        component={SignupScreen}
+        options={{ gestureEnabled: true }}
       />
     </Stack.Navigator>
   );

@@ -11,7 +11,8 @@ export const useData = () => {
   return context;
 };
 
-export const DataProvider = ({ children }) => {
+export const DataProvider =
+ ({ children }) => {
   const [sensorData, setSensorData] = useState({
     temperature: 18,
     humidity: 65,

@@ -56,8 +56,10 @@ const WaveFormContainer = ({ children, style }) => {
   );
 };
 
-const LoginScreen = ({ navigation }) => {
+const SignupScreen = ({ navigation }) => {
+  const [fullName, setFullName] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
+  const [address, setaddress] = useState('');
   const [password, setPassword] = useState('');
   const [selectedRole, setSelectedRole] = useState(UserRoles.WAREHOUSE_STAFF);
   const [loading, setLoading] = useState(false);
@@ -68,7 +70,7 @@ const LoginScreen = ({ navigation }) => {
   const containerTranslateY = useRef(new Animated.Value(0)).current;
   const headerHeight = useRef(new Animated.Value(1)).current;
   
-  const { login } = useAuth();
+  const { signup } = useAuth();
   const { t } = useLanguage();
 
   useEffect(() => {
@@ -125,24 +127,60 @@ const LoginScreen = ({ navigation }) => {
     };
   }, [containerTranslateY, headerHeight]);
 
-  const handleLogin = async () => {
+  const handleSignup = async () => {
+    // Validation
+    if (!fullName.trim()) {
+      Alert.alert('Error', t('enterFullName') || 'Please enter your full name');
+      return;
+    }
+    
     if (phoneNumber.length !== 10) {
-      Alert.alert('Error', 'Please enter a valid 10-digit phone number');
+      Alert.alert('Error', t('enterValidPhone') || 'Please enter a valid 10-digit phone number');
       return;
     }
 
-    if (!password.trim()) {
-      Alert.alert('Error', 'Please enter your password');
+    if (!address.trim()) {
+      Alert.alert('Error', t('enterValidaddress') || 'Please enter your address');
+      return;
+    }
+
+    if (!password.trim() || password.length < 6) {
+      Alert.alert('Error', t('enterValidPassword') || 'Please enter a password with at least 6 characters');
       return;
     }
 
     setLoading(true);
-    const result = await login(phoneNumber, password, selectedRole);
-    setLoading(false);
-
-    if (!result.success) {
-      Alert.alert('Error', result.error);
+    
+    try {
+      const userData = {
+        fullName,
+        phoneNumber,
+        address,
+        password,
+        role: selectedRole,
+      };
+      
+      const result = await signup(userData);
+      
+      if (result.success) {
+        Alert.alert(
+          t('signupSuccessful') || 'Signup Successful!', 
+          result.message || t('accountCreated') || 'Your account has been created successfully. You can now login.',
+          [
+            {
+              text: t('goToLogin') || 'Go to Login',
+              onPress: () => navigation.navigate('Login')
+            }
+          ]
+        );
+      } else {
+        Alert.alert('Error', result.error || 'Failed to create account');
+      }
+    } catch (error) {
+      Alert.alert('Error', error.message || 'Something went wrong');
     }
+    
+    setLoading(false);
   };
 
   const RoleSelector = () => (
@@ -209,73 +247,109 @@ const LoginScreen = ({ navigation }) => {
           <View style={styles.logoContainer}>
             <Ionicons name="leaf" size={60} color={Colors.surface} />
           </View>
-          <Text style={styles.title}>Smart Herbal Sprinkler</Text>
-          <Text style={styles.subtitle}>Climate-Controlled Onion Storage</Text>
+          <Text style={styles.title}>{t('createAccount') || 'Create Account'}</Text>
+          <Text style={styles.subtitle}>{t('joinWarehouseTeam') || 'Join Our Warehouse Team'}</Text>
         </Animated.View>
 
         <Animated.View style={{
           transform: [{ translateY: containerTranslateY }],
         }}>
           <WaveFormContainer style={styles.formContainer}>
-          <RoleSelector />
+            <RoleSelector />
 
-          <View style={styles.inputGroup}>
-            <Text style={styles.inputLabel}>Phone Number</Text>
-            <View style={styles.inputContainer}>
-              <Ionicons name="call" size={20} color={Colors.textSecondary} />
-              <TextInput
-                style={styles.input}
-                placeholder="Enter 10-digit phone number"
-                value={phoneNumber}
-                onChangeText={setPhoneNumber}
-                keyboardType="phone-pad"
-                maxLength={10}
-              />
+            {/* Full Name Input */}
+            <View style={styles.inputGroup}>
+              <Text style={styles.inputLabel}>{t('fullName') || 'Full Name'}</Text>
+              <View style={styles.inputContainer}>
+                <Ionicons name="person-outline" size={20} color={Colors.textSecondary} />
+                <TextInput
+                  style={styles.input}
+                  placeholder={t('enterFullName') || 'Enter your full name'}
+                  value={fullName}
+                  onChangeText={setFullName}
+                  autoCapitalize="words"
+                />
+              </View>
             </View>
-          </View>
 
-          <View style={styles.inputGroup}>
-            <Text style={styles.inputLabel}>Password</Text>
-            <View style={styles.inputContainer}>
-              <Ionicons name="lock-closed-outline" size={20} color={Colors.textSecondary} />
-              <TextInput
-                style={styles.input}
-                placeholder="Enter your password"
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry
-                autoCapitalize="none"
-              />
+            {/* Phone Number Input */}
+            <View style={styles.inputGroup}>
+              <Text style={styles.inputLabel}>{t('phoneNumber')}</Text>
+              <View style={styles.inputContainer}>
+                <Ionicons name="call" size={20} color={Colors.textSecondary} />
+                <TextInput
+                  style={styles.input}
+                  placeholder={t('enterPhoneNumber')}
+                  value={phoneNumber}
+                  onChangeText={setPhoneNumber}
+                  keyboardType="phone-pad"
+                  maxLength={10}
+                />
+              </View>
             </View>
-          </View>
 
-          <TouchableOpacity
-            style={[styles.button, loading && styles.buttonDisabled]}
-            onPress={handleLogin}
-            disabled={loading}
-          >
-            <Text style={styles.buttonText}>
-              {loading ? 'Loading...' : 'Login'}
-            </Text>
-          </TouchableOpacity>
-          
-          {/* Sign up link */}
-          <View style={styles.signupLinkContainer}>
-            <Text style={styles.signupLinkText}>
-              {t('noAccount') || 'Don\'t have an account? '}
-            </Text>
-            <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
-              <Text style={styles.signupLink}>{t('createAccount') || 'Sign up'}</Text>
+            {/* address Input */}
+            <View style={styles.inputGroup}>
+              <Text style={styles.inputLabel}>{t('address') || 'Address'}</Text>
+              <View style={styles.inputContainer}>
+              <Ionicons name="business-outline" size={20} color={Colors.textSecondary} />
+                <TextInput
+                  style={styles.input}
+                  placeholder={t('enterAddress') || 'Enter your address'}
+                  value={address}
+                  onChangeText={setaddress}
+                  keyboardType="Address"
+                  autoCapitalize="none"
+                />
+              </View>
+            </View>
+
+            {/* Password Input */}
+            <View style={styles.inputGroup}>
+              <Text style={styles.inputLabel}>{t('password') || 'Password'}</Text>
+              <View style={styles.inputContainer}>
+                <Ionicons name="lock-closed-outline" size={20} color={Colors.textSecondary} />
+                <TextInput
+                  style={styles.input}
+                  placeholder={t('enterPassword') || 'Enter your password (min 6 characters)'}
+                  value={password}
+                  onChangeText={setPassword}
+                  secureTextEntry
+                  autoCapitalize="none"
+                />
+              </View>
+            </View>
+
+            <TouchableOpacity
+              style={[styles.button, loading && styles.buttonDisabled]}
+              onPress={handleSignup}
+              disabled={loading}
+            >
+              <Text style={styles.buttonText}>
+                {loading 
+                  ? (t('loading') || 'Loading...') 
+                  : (t('createAccount') || 'Create Account')
+                }
+              </Text>
             </TouchableOpacity>
-          </View>
 
-          {/* Footer inside form container */}
-          <View style={styles.footer}>
-            <Text style={styles.footerText}>
-              {t('secureSystem')}
-            </Text>
-          </View>
-        </WaveFormContainer>
+            {/* Login Link */}
+            <View style={styles.loginLinkContainer}>
+              <Text style={styles.loginLinkText}>
+                {t('alreadyHaveAccount') || 'Already have an account? '}
+              </Text>
+              <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+                <Text style={styles.loginLink}>{t('login')}</Text>
+              </TouchableOpacity>
+            </View>
+            
+            {/* Footer inside form container */}
+            <View style={styles.footer}>
+              <Text style={styles.footerText}>
+                {t('secureSystem')}
+              </Text>
+            </View>
+          </WaveFormContainer>
         </Animated.View>
       </ScrollView>
     </LinearGradient>
@@ -294,8 +368,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: Spacing.xl,
-    paddingVertical: Spacing.xl,
-    minHeight: 200,
+    paddingVertical: Spacing.lg,
+    minHeight: 180,
     transformOrigin: 'top',
   },
   headerTop: {
@@ -328,7 +402,7 @@ const styles = StyleSheet.create({
   formContainer: {
     backgroundColor: 'transparent',
     overflow: 'hidden',
-    minHeight: 400,
+    minHeight: 500,
   },
   wavePath: {
     position: 'relative',
@@ -340,7 +414,7 @@ const styles = StyleSheet.create({
     paddingBottom: Spacing.xl,
     zIndex: 2,
     backgroundColor: Colors.surface,
-    minHeight: 350,
+    minHeight: 450,
   },
   roleSelector: {
     marginBottom: Spacing.lg,
@@ -425,18 +499,18 @@ const styles = StyleSheet.create({
     fontSize: Fonts.sizes.medium,
     fontWeight: '500',
   },
-  signupLinkContainer: {
+  loginLinkContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: Spacing.lg,
     paddingVertical: Spacing.md,
   },
-  signupLinkText: {
+  loginLinkText: {
     color: Colors.textSecondary,
     fontSize: Fonts.sizes.medium,
   },
-  signupLink: {
+  loginLink: {
     color: Colors.primary,
     fontSize: Fonts.sizes.medium,
     fontWeight: 'bold',
@@ -447,10 +521,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   footerText: {
-    color: Colors.surface + 'AA',
+    color: Colors.textSecondary,
     fontSize: Fonts.sizes.small,
     textAlign: 'center',
   },
 });
 
-export default LoginScreen;
+export default SignupScreen;

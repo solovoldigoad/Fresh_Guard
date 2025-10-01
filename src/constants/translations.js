@@ -15,6 +15,26 @@ export const translations = {
     loading: 'Loading...',
     secureSystem: 'Secure warehouse monitoring system',
     
+    // Signup
+    createAccount: 'Create Account',
+    fullName: 'Full Name',
+    email: 'Email Address',
+    warehouseCode: 'Warehouse Code',
+    enterFullName: 'Enter your full name',
+    enterEmail: 'Enter your email address',
+    enterWarehouseCode: 'Enter warehouse code',
+    enterValidPhone: 'Please enter a valid 10-digit phone number',
+    enterValidEmail: 'Please enter a valid email address',
+    joinWarehouseTeam: 'Join Our Warehouse Team',
+    signupSuccessful: 'Signup Successful!',
+    accountCreated: 'Your account has been created successfully. You can now login.',
+    goToLogin: 'Go to Login',
+    alreadyHaveAccount: 'Already have an account? ',
+    noAccount: 'Don\'t have an account? ',
+    otpSent: 'OTP Sent',
+    otpSentMessage: 'Use 1234 as OTP for demo purposes',
+    invalidOTP: 'Invalid OTP',
+    
     // Dashboard
     connected: 'Connected',
     smsAlertActive: 'SMS Alert Active - Offline Mode',
@@ -132,6 +152,26 @@ export const translations = {
     resendOTP: 'ओटीपी पुनः भेजें',
     loading: 'लोड हो रहा है...',
     secureSystem: 'सुरक्षित गोदाम निगरानी प्रणाली',
+    
+    // Signup
+    createAccount: 'खाता बनाएं',
+    fullName: 'पूरा नाम',
+    email: 'ईमेल पता',
+    warehouseCode: 'गोदाम कोड',
+    enterFullName: 'अपना पूरा नाम दर्ज करें',
+    enterEmail: 'अपना ईमेल पता दर्ज करें',
+    enterWarehouseCode: 'गोदाम कोड दर्ज करें',
+    enterValidPhone: 'कृपया एक वैध 10-अंकीय फ़ोन नंबर दर्ज करें',
+    enterValidEmail: 'कृपया एक वैध ईमेल पता दर्ज करें',
+    joinWarehouseTeam: 'हमारी गोदाम टीम में शामिल हों',
+    signupSuccessful: 'साइनअप सफल!',
+    accountCreated: 'आपका खाता सफलतापूर्वक बनाया गया है। अब आप लॉगिन कर सकते हैं।',
+    goToLogin: 'लॉगिन पर जाएं',
+    alreadyHaveAccount: 'पहले से एक खाता है? ',
+    noAccount: 'खाता नहीं है? ',
+    otpSent: 'ओटीपी भेजा गया',
+    otpSentMessage: 'डेमो के लिए ओटीपी के रूप में 1234 का उपयोग करें',
+    invalidOTP: 'अवैध ओटीपी',
     
     // Dashboard
     connected: 'कनेक्टेड',

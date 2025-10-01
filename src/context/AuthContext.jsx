@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { UserRoles } from '../constants/theme';
+import { API } from '../config/api';
 
 const AuthContext = createContext({});
 
@@ -42,34 +43,69 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const login = async (phoneNumber, otp, role = UserRoles.WAREHOUSE_STAFF) => {
+  const login = async (phoneNumber, password, role = UserRoles.WAREHOUSE_STAFF) => {
     try {
-      // Simulate OTP verification
-      if (otp === '1234') {
-        const userData = {
-          id: Date.now().toString(),
-          phoneNumber,
-          role,
-          name: role === UserRoles.ADMIN ? 'Admin User' : 'Warehouse Staff',
-        };
+      const response = await API.auth.login({
+        phoneNumber,
+        password,
+        role,
+      });
+      
+      if (response.success) {
+        const { user, token } = response.data;
         
-        await AsyncStorage.setItem('user', JSON.stringify(userData));
-        setUser(userData);
+        // Store user data and token
+        await AsyncStorage.setItem('user', JSON.stringify(user));
+        await AsyncStorage.setItem('token', token);
+        
+        setUser(user);
         return { success: true };
       } else {
-        return { success: false, error: 'Invalid OTP' };
+        return { success: false, error: response.message || 'Login failed' };
       }
     } catch (error) {
-      return { success: false, error: error.message };
+      console.error('Login error:', error);
+      return { success: false, error: error.message || 'Network error occurred' };
     }
   };
 
   const logout = async () => {
     try {
-      await AsyncStorage.removeItem('user');
+      await AsyncStorage.multiRemove(['user', 'token']);
       setUser(null);
     } catch (error) {
       console.error('Error logging out:', error);
+    }
+  };
+
+  const signup = async (userData) => {
+    try {
+      const response = await API.auth.signup({
+        fullName: userData.fullName,
+        phoneNumber: userData.phoneNumber,
+        address: userData.address,
+        password: userData.password,
+        role: userData.role || UserRoles.WAREHOUSE_STAFF,
+      });
+      
+      if (response.success) {
+        return { 
+          success: true, 
+          message: response.message || 'Account created successfully',
+          data: response.data
+        };
+      } else {
+        return { 
+          success: false, 
+          error: response.message || 'Signup failed' 
+        };
+      }
+    } catch (error) {
+      console.error('Signup error:', error);
+      return { 
+        success: false, 
+        error: error.message || 'Network error occurred' 
+      };
     }
   };
 
@@ -93,6 +129,7 @@ export const AuthProvider = ({ children }) => {
   const value = {
     user,
     login,
+    signup,
     logout,
     switchRole,
     completeWelcome,
